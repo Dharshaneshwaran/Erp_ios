@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "disable-sandbox": true,
+  "rules": [
+    {
+      "regex": "ViewController",
+      "message": "Use SwiftUI instead of UIKit ViewControllers",
+      "severity": "warning"
+    },
+    {
+      "regex": "dispatch_async",
+      "message": "Use async/await instead of dispatch_async",
+      "severity": "warning"
+    }
+  ]
+}

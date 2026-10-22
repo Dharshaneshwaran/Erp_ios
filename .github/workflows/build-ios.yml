@@ -1,0 +1,64 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode version
+      run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    
+    - name: Build iOS App
+      run: |
+        xcodebuild \
+          -scheme SNSSchoolsApp \
+          -configuration Release \
+          -destination generic/platform=iOS \
+          -derivedDataPath build \
+          -arch arm64 \
+          build
+    
+    - name: Create IPA
+      run: |
+        xcodebuild \
+          -scheme SNSSchoolsApp \
+          -configuration Release \
+          -destination generic/platform=iOS \
+          -archivePath build/SNSSchoolsApp.xcarchive \
+          archive
+        
+        xcodebuild \
+          -exportArchive \
+          -archivePath build/SNSSchoolsApp.xcarchive \
+          -exportOptionsPlist ExportOptions.plist \
+          -exportPath build/ipa
+    
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: SNSSchoolsApp-iOS
+        path: build/ipa/SNSSchoolsApp.ipa
+        retention-days: 30
+    
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: SNSSchoolsApp-Build
+        path: build/
+        retention-days: 7
+    
+    - name: Build Summary
+      run: |
+        echo "✅ iOS App Build Successful!"
+        echo "📦 Download IPA from Artifacts"
+        echo "📱 Install on iPhone/iPad"
+        echo "🚀 Ready for TestFlight or App Store"
